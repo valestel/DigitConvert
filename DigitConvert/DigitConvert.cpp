@@ -1,10 +1,10 @@
 ﻿#include <iostream>
 #include <string>
-#include <regex>
 #include <stack>
 #include <math.h>
 #include <stdint.h>
 #include <cassert>
+
 
 using namespace std;
 
@@ -18,24 +18,31 @@ string million[] = { "миллион","миллиона","миллионов" };
 string billion[] = { "миллиард","миллиарда" };
 
 
+bool check_digit(string s) {
+	int size = s.length();
+	for (int i = 0; i < size; i++) {
+		if ((s[i] < '0' || s[i] > '9') && !(i == 0 && (s[i] == '+' || s[i] == '-'))) {
+			return false;
+		}
+	}
+	return true;
+}
+
 int inputNumber()
 {
 	string n;
-	regex regex_pattern("-?[0-9]+");
 	cout << "Введите число: ";
 	while (cin >> n) {
-		if (!regex_match(n, regex_pattern)) {
+			if (!check_digit(n)) {
 			cout << "Ошибка, введите ещё раз: ";
-		}
-		else if ((stol(n) <= INT32_MIN) || (stol(n) > INT32_MAX)) {
-			cout << "Введите другое число: ";
-		}
-		else {
-			break;
-		}
-
+			}
+			else if ((stoll(n) <= INT32_MIN) || (stoll(n) >= INT32_MAX)) {
+				cout << "Введите другое число: ";
+			}
+			else {
+				break;
+			}
 	}
-
 	return stoi(n);
 }
 
@@ -206,6 +213,19 @@ void internalTest() {
 	assert(TranslateNumber(1232000999) == "один миллиард двести тридцать два миллиона девятьсот девяносто девять");
 	assert(TranslateNumber(INT32_MIN) == "минус два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок восемь");
 	assert(TranslateNumber(INT32_MAX) == "два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь");
+	
+	/*
+	assert(check_digit("123") == 1);
+	assert(check_digit("-123") == 1);
+	assert(check_digit("1-23") == 0);
+	assert(check_digit("123fg") == 0);
+	assert(check_digit("12-fg") == 0);
+	assert(check_digit("-12rg") == 0);
+	assert(check_digit("12аир") == 0);
+	assert(check_digit("пик466") == 0);
+	assert(check_digit("34-4перн") == 0);
+	assert(check_digit("-67цуит") == 0);
+	*/
 }
 
 int main(int argc, char** argv) {
