@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <cassert>
+#include <stdexcept>
 
 
 using namespace std;
@@ -34,14 +35,19 @@ int InputNumber() {
 	string n;
 	cout << "Введите число: ";
 	while (cin >> n) {
-		if (!CheckDigit(n)) {
-		cout << "Ошибка, введите ещё раз: ";
+		try {
+			if (!CheckDigit(n)) {
+				cout << "Ошибка, введите ещё раз: ";
+			}
+			else if ((stoll(n) <= INT32_MIN) || (stoll(n) >= INT32_MAX)) {
+				cout << "Введите другое число: ";
+			}
+			else {
+				break;
+			}
 		}
-		else if ((stoll(n) <= INT32_MIN) || (stoll(n) >= INT32_MAX)) {
+		catch (out_of_range& oor) {
 			cout << "Введите другое число: ";
-		}
-		else {
-			break;
 		}
 	}
 	return stoi(n);
