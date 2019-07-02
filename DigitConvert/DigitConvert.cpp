@@ -8,7 +8,7 @@
 
 using namespace std;
 
-//массивы числительных
+// массивы числительных
 string units[] = { "","один","два","три","четыре","пять","шесть","семь","восемь","девять" };
 string tens[] = { "десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать" };
 string scores[] = { "","десять","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто" };
@@ -18,7 +18,8 @@ string million[] = { "миллион","миллиона","миллионов" };
 string billion[] = { "миллиард","миллиарда" };
 
 
-bool check_digit(string s) {
+// проверка на наличие не-цифр или минуса-плюса посреди строки
+bool CheckDigit(const string &s) {
 	int size = s.length();
 	for (int i = 0; i < size; i++) {
 		if ((s[i] < '0' || s[i] > '9') && !(i == 0 && (s[i] == '+' || s[i] == '-'))) {
@@ -28,28 +29,31 @@ bool check_digit(string s) {
 	return true;
 }
 
-int inputNumber()
-{
+// проверка входного числа
+int InputNumber() {
 	string n;
 	cout << "Введите число: ";
 	while (cin >> n) {
-			if (!check_digit(n)) {
-			cout << "Ошибка, введите ещё раз: ";
-			}
-			else if ((stoll(n) <= INT32_MIN) || (stoll(n) >= INT32_MAX)) {
-				cout << "Введите другое число: ";
-			}
-			else {
-				break;
-			}
+		if (!CheckDigit(n)) {
+		cout << "Ошибка, введите ещё раз: ";
+		}
+		else if ((stoll(n) <= INT32_MIN) || (stoll(n) >= INT32_MAX)) {
+			cout << "Введите другое число: ";
+		}
+		else {
+			break;
+		}
 	}
 	return stoi(n);
 }
 
-//выбор правильной словоформы для разряда: тысяча, тысяч и т.д.
+// выбор правильной словоформы для разряда: тысяча, тысяч и т.д.
 int ChooseForm(int n) {
 	int index = 2;
-	int digits = int(log10(n) + 1); // количество знаков числа
+	int digits = 1;
+	int num = n;
+	// определение количества знаков числа
+	while ((num /= 10) > 0) digits++;
 	switch (digits) {
 	case 1:
 		if (n == 1) {
@@ -79,10 +83,10 @@ int ChooseForm(int n) {
 			}
 		}
 		else {
-			if (n % 100 % 10 == 1) {
+			if (n % 10 == 1) {
 				index = 0;
 			}
-			else if ((n % 100 % 10 > 1) && (n % 100 % 10 < 5)) {
+			else if ((n % 10 > 1) && (n % 10 < 5)) {
 				index = 1;
 			}
 		}
@@ -91,12 +95,12 @@ int ChooseForm(int n) {
 	return index;
 }
 
-//выбор разряда: тысячи, миллионы, и т.д.
+// выбор разряда: тысячи, миллионы, и т.д.
 string DefineRank(int r, int n) { 
 	string rank = "";
 	switch (r) {
 	case 2:
-		units[1] = "одна"; //для согласования с тысячей
+		units[1] = "одна";  // для согласования с тысячей
 		units[2] = "двe";
 		rank = thousand[ChooseForm(n)];
 		break;
@@ -114,12 +118,12 @@ string DefineRank(int r, int n) {
 	return rank;
 }
 
-//перевод в число прописью
+// перевод в число прописью
 string ConvertNumber(int n) { 
 	string numeral = "";
-	int hundreds_number = n / 100; //число сотен
-	int scores_number = n / 10 % 10; //число десятков
-	int units_number = n % 10; //число единиц
+	int hundreds_number = n / 100;  // число сотен
+	int scores_number = n / 10 % 10;  // число десятков
+	int units_number = n % 10;  // число единиц
 	string space = "";
 	if (hundreds_number != 0) {
 		space = " ";
@@ -146,11 +150,11 @@ string ConvertNumber(int n) {
 	}
 	return numeral;
 }
-//перевод в прописную форму числа целиком
+// перевод в прописную форму числа целиком
 string TranslateNumber(int n) { 
 	stack <int> nums;
-	string output = ""; //итоговая строка вывода
-	string minus = ""; //для отрицательных чисел
+	string output = "";  // итоговая строка вывода
+	string minus = "";  // для отрицательных чисел
 	if (n == 0) {
 		output = "ноль";
 	}
@@ -161,7 +165,8 @@ string TranslateNumber(int n) {
 	if (n == INT32_MIN) {
 		return "минус два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок восемь";
 	}
-	while (n != 0) { //запись числа в стек тройками-разрядами
+	// запись числа в стек тройками-разрядами
+	while (n != 0) {
 		int k = n % 1000;
 		n = n / 1000;
 		nums.push(k);
@@ -170,7 +175,8 @@ string TranslateNumber(int n) {
 	while (!nums.empty()) {
 		string space = " ";
 		int triple = nums.top();
-		if (triple != 0) { //перевод каждой тройки в прописную форму с указанием разряда и добавление к строке
+		// перевод каждой тройки в прописную форму с указанием разряда и добавление к строке
+		if (triple != 0) {
 			if (nums.size() < 2) {
 				space = "";
 			}
@@ -181,7 +187,7 @@ string TranslateNumber(int n) {
 	return minus + output;
 }
 
-void internalTest() {
+void InternalTest() {
 	assert(TranslateNumber(0) == "ноль");
 	assert(TranslateNumber(-5) == "минус пять");
 	assert(TranslateNumber(8) == "восемь");
@@ -213,26 +219,23 @@ void internalTest() {
 	assert(TranslateNumber(1232000999) == "один миллиард двести тридцать два миллиона девятьсот девяносто девять");
 	assert(TranslateNumber(INT32_MIN) == "минус два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок восемь");
 	assert(TranslateNumber(INT32_MAX) == "два миллиарда сто сорок семь миллионов четыреста восемьдесят три тысячи шестьсот сорок семь");
-	
-	/*
-	assert(check_digit("123") == 1);
-	assert(check_digit("-123") == 1);
-	assert(check_digit("1-23") == 0);
-	assert(check_digit("123fg") == 0);
-	assert(check_digit("12-fg") == 0);
-	assert(check_digit("-12rg") == 0);
-	assert(check_digit("12аир") == 0);
-	assert(check_digit("пик466") == 0);
-	assert(check_digit("34-4перн") == 0);
-	assert(check_digit("-67цуит") == 0);
-	*/
+	assert(CheckDigit("123") == true);
+	assert(CheckDigit("-123") == true);
+	assert(CheckDigit("1-23") == false);
+	assert(CheckDigit("123fg") == false);
+	assert(CheckDigit("12-fg") == false);
+	assert(CheckDigit("-12rg") == false);
+	assert(CheckDigit("12аир") == false);
+	assert(CheckDigit("пик466") == false);
+	assert(CheckDigit("34-4перн") == false);
+	assert(CheckDigit("-67цуит") == false);
 }
 
 int main(int argc, char** argv) {
 	if (argc > 1 && (strcmp(argv[1],"--test") == 0)) {
-		internalTest();
+		InternalTest();
 		return 0;
 	}
-	cout << TranslateNumber(inputNumber());
+	cout << TranslateNumber(InputNumber());
 	return 0;
 }
