@@ -56,47 +56,14 @@ int InputNumber() {
 // выбор правильной словоформы для разряда: тысяча, тысяч и т.д.
 int ChooseForm(int n) {
 	int index = 2;
-	int digits = 1;
-	int num = n;
-	// определение количества знаков числа
-	while ((num /= 10) > 0) digits++;
-	switch (digits) {
-	case 1:
-		if (n == 1) {
+	int last_digit = n % 10;
+	if (!(n % 100 >= 10 && n % 100 <= 19)) {
+		if (last_digit == 1) {
 			index = 0;
 		}
-		else if ((n > 1) && (n < 5)) {
+		else if (last_digit > 1 && last_digit < 5) {
 			index = 1;
 		}
-		break;
-	case 2:
-		if (n >= 20) {
-			if (n % 10 == 1) {
-				index = 0;
-			}
-			else if ((n % 10 > 1) && (n % 10 < 5)) {
-				index = 1;
-			}
-		}
-		break;
-	case 3:
-		if ((n % 100 >= 1) && (n % 100 < 20)) {
-			if (n % 100 == 1) {
-				index = 0;
-			}
-			else if ((n % 100 > 1) && (n % 100 < 5)) {
-				index = 1;
-			}
-		}
-		else {
-			if (n % 10 == 1) {
-				index = 0;
-			}
-			else if ((n % 10 > 1) && (n % 10 < 5)) {
-				index = 1;
-			}
-		}
-		break;
 	}
 	return index;
 }
