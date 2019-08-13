@@ -10,18 +10,18 @@
 using namespace std;
 
 // массивы числительных
-string units[] = { "","один","два","три","четыре","пять","шесть","семь","восемь","девять" };
-string tens[] = { "десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать" };
-string scores[] = { "","десять","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто" };
-string hundreds[] = { "","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот" };
-string thousand[] = { "тысяча","тысячи","тысяч" };
-string million[] = { "миллион","миллиона","миллионов" };
-string billion[] = { "миллиард","миллиарда" };
-
+const string units[] = {"","один","два","три","четыре","пять","шесть","семь","восемь","девять" };
+const string th_units[] = { "","одна","две","три","четыре","пять","шесть","семь","восемь","девять" };
+const string tens[] = { "десять","одиннадцать","двенадцать","тринадцать","четырнадцать","пятнадцать","шестнадцать","семнадцать","восемнадцать","девятнадцать" };
+const string scores[] = { "","десять","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто" };
+const string hundreds[] = { "","сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот" };
+const string thousand[] = { "тысяча","тысячи","тысяч" };
+const string million[] = { "миллион","миллиона","миллионов" };
+const string billion[] = { "миллиард","миллиарда" };
 
 // проверка на наличие не-цифр или минуса-плюса посреди строки
 bool CheckDigit(const string &s) {
-	int size = s.length();
+	int size = (int) s.length();
 	for (int i = 0; i < size; i++) {
 		if ((s[i] < '0' || s[i] > '9') && !(i == 0 && (s[i] == '+' || s[i] == '-'))) {
 			return false;
@@ -46,7 +46,7 @@ int InputNumber() {
 				break;
 			}
 		}
-		catch (out_of_range& oor) {
+		catch (out_of_range&) {
 			cout << "Введите другое число: ";
 		}
 	}
@@ -73,8 +73,6 @@ string DefineRank(int r, int n) {
 	string rank = "";
 	switch (r) {
 	case 2:
-		units[1] = "одна";  // для согласования с тысячей
-		units[2] = "двe";
 		rank = thousand[ChooseForm(n)];
 		break;
 	case 3:
@@ -83,21 +81,18 @@ string DefineRank(int r, int n) {
 	case 4:
 		rank = billion[ChooseForm(n)];
 		break;
-	default:
-		units[1] = "один";
-		units[2] = "два";
-		break;
 	}
 	return rank;
 }
 
 // перевод в число прописью
-string ConvertNumber(int n) { 
+string ConvertNumber(int n, const string* p_units) { 
 	string numeral = "";
 	int hundreds_number = n / 100;  // число сотен
 	int scores_number = n / 10 % 10;  // число десятков
 	int units_number = n % 10;  // число единиц
 	string space = "";
+
 	if (hundreds_number != 0) {
 		space = " ";
 	}
@@ -107,10 +102,10 @@ string ConvertNumber(int n) {
 		break;
 	case 0:
 		if (hundreds_number == 0) {
-			numeral = units[units_number];
+			numeral = *(p_units + units_number);
 		}
 		else {
-			numeral = hundreds[hundreds_number] + space + units[units_number];
+			numeral = hundreds[hundreds_number] + space + *(p_units + units_number);
 		}
 		break;
 	default:
@@ -118,7 +113,7 @@ string ConvertNumber(int n) {
 			numeral = hundreds[hundreds_number] + space + scores[scores_number];
 		}
 		else {
-			numeral = hundreds[hundreds_number] + space + scores[scores_number] + " " + units[units_number];
+			numeral = hundreds[hundreds_number] + space + scores[scores_number] + " " + *(p_units + units_number);
 		}
 	}
 	return numeral;
@@ -153,7 +148,9 @@ string TranslateNumber(int n) {
 			if (nums.size() < 2) {
 				space = "";
 			}
-			output += ConvertNumber(triple) + space + DefineRank(nums.size(), triple) + space;
+			int rank = (int) nums.size();
+			const string* p_units = rank == 2 ? th_units : units;
+			output += ConvertNumber(triple, p_units) + space + DefineRank(rank, triple) + space;
 		}
 		nums.pop();
 	}
@@ -183,7 +180,7 @@ void InternalTest() {
 	assert(TranslateNumber(-1456014) == "минус один миллион четыреста пятьдесят шесть тысяч четырнадцать");
 	assert(TranslateNumber(1010101) == "один миллион десять тысяч сто один");
 	assert(TranslateNumber(23576291) == "двадцать три миллиона пятьсот семьдесят шесть тысяч двести девяносто один");
-	assert(TranslateNumber(-60402090) == "минус шестьдесят миллионов четыреста двe тысячи девяносто");
+	assert(TranslateNumber(-60402090) == "минус шестьдесят миллионов четыреста две тысячи девяносто");
 	assert(TranslateNumber(48484848) == "сорок восемь миллионов четыреста восемьдесят четыре тысячи восемьсот сорок восемь");
 	assert(TranslateNumber(856438291) == "восемьсот пятьдесят шесть миллионов четыреста тридцать восемь тысяч двести девяносто один");
 	assert(TranslateNumber(-151515151) == "минус сто пятьдесят один миллион пятьсот пятнадцать тысяч сто пятьдесят один");
